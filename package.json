@@ -18,8 +18,26 @@
 			{
 				"command": "linkback.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "linkback.helloWorld2",
+				"title": "Hello World 2"
 			}
-		]
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "true",
+					"command": "linkback.helloWorld",
+					"group": "navigation"
+				},
+				{
+					"when": "editorHasSelection",
+					"command": "linkback.helloWorld2",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
