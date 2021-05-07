@@ -4,19 +4,30 @@ import * as vscode from 'vscode';
 import * as child_process from 'child_process';
 import * as path from 'path';
 
+enum RepoType {
+	GitHub,
+	GitLab,
+	Other
+}
+
+type RepoParseResult = {
+	url: string,
+	repoType: RepoType
+}
+
 type SourceLocation = {
 	line: number,
-};
+}
 
 type SourceSelection = {
 	start: SourceLocation,
 	end: SourceLocation,
-};
+}
 
 type SourceItem = {
 	filepath: string,
 	selection: SourceSelection | undefined,
-};
+}
 
 async function executeCommand(command: string): Promise<string | undefined> {
 	console.debug(`Executing: ${command}`);
@@ -73,17 +84,27 @@ function repoPathToFile(repoPath: string, item: SourceItem): string {
 	return item.filepath.replace(repoPath, '');
 }
 
-// #L6-10
-function createSelectionInfo(item: SourceItem): string {
+// gitlab: #L6-10
+// github: #L6-L10
+function createSelectionInfo(item: SourceItem, repoType: RepoType): string {
 	if (item.selection === undefined) {
 		return '';
 	}
 
-	return `#L${item.selection.start.line + 1}-${item.selection.end.line + 1}`;
+	const startLine = item.selection.start.line + 1;
+	const endLine = item.selection.end.line + 1;
+
+	switch (repoType) {
+		case RepoType.GitLab:
+			return `#L${startLine}-${endLine}`;
+		case RepoType.GitHub:
+		case RepoType.Other:
+			return `#L${startLine}-L${endLine}`;
+	}
 }
 
 // git@github.com:org/repo.git
-function parseUrl(repoUrl: string): string {
+function parseUrl(repoUrl: string): RepoParseResult {
 	console.debug(`Parsing url: ${repoUrl}`);
 
 	const urlRegex = /^git@(?<hostName>\w+.\w+)$/
@@ -104,7 +125,17 @@ function parseUrl(repoUrl: string): string {
 	const url = `https://${hostName}/${orgAndRepo}`;
 	console.debug(`Parsed url: ${url}`);
 
-	return url;
+	let repoType = RepoType.Other;
+	if (hostName.includes('github')) {
+		repoType = RepoType.GitHub;
+	} else if (hostName.includes('gitlab')) {
+		repoType = RepoType.GitLab;
+	}
+
+	return {
+		url,
+		repoType
+	};
 }
 
 async function buildUrl(item: SourceItem): Promise<string | undefined> {
@@ -129,9 +160,9 @@ async function buildUrl(item: SourceItem): Promise<string | undefined> {
 		}
 
 		const pathToFile = repoPathToFile(repoPath, item);
-		const baseUrl = parseUrl(repoUrl);
-		const selectionInfo = createSelectionInfo(item);
-		const finalUrl = `${baseUrl}/blob/${branch}${pathToFile}${selectionInfo}`;
+		const parseResult = parseUrl(repoUrl);
+		const selectionInfo = createSelectionInfo(item, parseResult.repoType);
+		const finalUrl = `${parseResult.url}/blob/${branch}${pathToFile}${selectionInfo}`;
 
 		console.debug(`Final url: ${finalUrl}`);
 		return finalUrl;
