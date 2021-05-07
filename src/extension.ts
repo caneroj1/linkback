@@ -5,7 +5,6 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 type SourceLocation = {
-	character: number,
 	line: number,
 };
 
@@ -74,6 +73,15 @@ function repoPathToFile(repoPath: string, item: SourceItem): string {
 	return item.filepath.replace(repoPath, '');
 }
 
+// #L6-10
+function createSelectionInfo(item: SourceItem): string {
+	if (item.selection === undefined) {
+		return '';
+	}
+
+	return `#L${item.selection.start.line}-${item.selection.end.line}`;
+}
+
 // git@github.com:org/repo.git
 function parseUrl(repoUrl: string): string {
 	console.debug(`Parsing url: ${repoUrl}`);
@@ -100,6 +108,7 @@ function parseUrl(repoUrl: string): string {
 }
 
 async function buildUrl(item: SourceItem): Promise<string | undefined> {
+	console.debug('Building url for source item: ', item);
 	try {
 		const repoPath = await getRepoRootPath(item);
 		if (!repoPath) {
@@ -121,7 +130,8 @@ async function buildUrl(item: SourceItem): Promise<string | undefined> {
 
 		const pathToFile = repoPathToFile(repoPath, item);
 		const baseUrl = parseUrl(repoUrl);
-		const finalUrl = `${baseUrl}/blob/${branch}${pathToFile}`;
+		const selectionInfo = createSelectionInfo(item);
+		const finalUrl = `${baseUrl}/blob/${branch}${pathToFile}${selectionInfo}`;
 
 		console.debug(`Final url: ${finalUrl}`);
 		return finalUrl;
@@ -152,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
-	const disposable2 = vscode.commands.registerCommand('linkback.helloWorld2', () => {
+	const disposable2 = vscode.commands.registerCommand('linkback.helloWorld2', async () => {
 		// The code you place here will be executed every time your command is executed
 
 		// Display a message box to the user
@@ -164,12 +174,28 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
+		const editor = vscode.window.activeTextEditor;
+		const document = editor.document;
+		const selection = editor.selection;
+
 		const sourceItem: SourceItem = {
-			filepath: vscode.window.activeTextEditor.document.fileName,
-			selection: undefined,
+			filepath: document.fileName,
+			selection: {
+				start: {
+					line: selection.start.line,
+				},
+				end: {
+					line: selection.end.line,
+				},
+			},
+		};
+		const url = await buildUrl(sourceItem);
+		if (!url) {
+			return;
 		}
-		buildUrl(sourceItem);
-		vscode.window.showInformationMessage('Hello World 2 from linkback!');
+
+		console.debug(`Launching: ${url}`);
+		vscode.env.openExternal(vscode.Uri.parse(url));
 	});
 
 	context.subscriptions.push(disposable2);
