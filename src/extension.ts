@@ -79,7 +79,7 @@ function createSelectionInfo(item: SourceItem): string {
 		return '';
 	}
 
-	return `#L${item.selection.start.line}-${item.selection.end.line}`;
+	return `#L${item.selection.start.line + 1}-${item.selection.end.line + 1}`;
 }
 
 // git@github.com:org/repo.git

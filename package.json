@@ -18,11 +18,11 @@
 		"commands": [
 			{
 				"command": "linkback.openFile",
-				"title": "Open File in Repo"
+				"title": "Linkback: Open File in Repo"
 			},
 			{
 				"command": "linkback.openFileSelection",
-				"title": "Open Selection in Repo"
+				"title": "Linkback: Open Selection in Repo"
 			}
 		],
 		"menus": {
