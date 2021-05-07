@@ -7,12 +7,12 @@ import * as path from 'path';
 enum RepoType {
 	GitHub,
 	GitLab,
-	Other
+	Other,
 }
 
 type RepoParseResult = {
 	url: string,
-	repoType: RepoType
+	repoType: RepoType,
 }
 
 type SourceLocation = {
@@ -233,4 +233,4 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
