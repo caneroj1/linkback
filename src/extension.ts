@@ -141,35 +141,40 @@ async function buildUrl(item: SourceItem): Promise<string | undefined> {
 	return;
 }
 
+function linkBack(item: SourceItem) {
+	const url = await buildUrl(item);
+	if (!url) {
+		return;
+	}
+
+	console.debug(`Launching: ${url}`);
+	vscode.env.openExternal(vscode.Uri.parse(url));
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	console.log('"linkback" now active');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "linkback" is now active!');
+	const openFileDisposable = vscode.commands.registerCommand('linkback.openFile', async () => {
+		if (!vscode.window.activeTextEditor) {
+			return;
+		}
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('linkback.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+		const editor = vscode.window.activeTextEditor;
+		const document = editor.document;
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from linkback!');
+		const sourceItem: SourceItem = {
+			filepath: document.fileName,
+			selection: undefined,
+		};
+
+		linkBack(sourceItem);
 	});
 
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(openFileDisposable);
 
-	const disposable2 = vscode.commands.registerCommand('linkback.helloWorld2', async () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		console.log(vscode.window.activeTextEditor?.selection);
-		console.log(vscode.window.activeTextEditor?.document);
-		console.log(vscode.workspace.workspaceFolders);
-
+	const openFileSelectionDisposable = vscode.commands.registerCommand('linkback.openFileSelection', async () => {
 		if (!vscode.window.activeTextEditor) {
 			return;
 		}
@@ -189,16 +194,11 @@ export function activate(context: vscode.ExtensionContext) {
 				},
 			},
 		};
-		const url = await buildUrl(sourceItem);
-		if (!url) {
-			return;
-		}
 
-		console.debug(`Launching: ${url}`);
-		vscode.env.openExternal(vscode.Uri.parse(url));
+		linkBack(sourceItem);
 	});
 
-	context.subscriptions.push(disposable2);
+	context.subscriptions.push(openFileSelectionDisposable);
 }
 
 // this method is called when your extension is deactivated

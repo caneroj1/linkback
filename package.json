@@ -16,24 +16,24 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "linkback.helloWorld",
-				"title": "Hello World"
+				"command": "linkback.openFile",
+				"title": "Open File in Repo"
 			},
 			{
-				"command": "linkback.helloWorld2",
-				"title": "Hello World 2"
+				"command": "linkback.openFileSelection",
+				"title": "Open Selection in Repo"
 			}
 		],
 		"menus": {
 			"editor/context": [
 				{
 					"when": "true",
-					"command": "linkback.helloWorld",
+					"command": "linkback.openFile",
 					"group": "navigation"
 				},
 				{
 					"when": "editorHasSelection",
-					"command": "linkback.helloWorld2",
+					"command": "linkback.openFileSelection",
 					"group": "navigation"
 				}
 			]
