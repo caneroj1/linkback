@@ -10,7 +10,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:linkback.helloWorld"
+		"onCommand:linkback.openFile",
+		"onCommand:linkback.openFileSelection"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {

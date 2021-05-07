@@ -141,7 +141,7 @@ async function buildUrl(item: SourceItem): Promise<string | undefined> {
 	return;
 }
 
-function linkBack(item: SourceItem) {
+async function linkBack(item: SourceItem) {
 	const url = await buildUrl(item);
 	if (!url) {
 		return;
