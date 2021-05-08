@@ -73,20 +73,17 @@ export async function buildUrl(item: SourceItem): Promise<string | undefined> {
 	try {
 		const repoPath = await getRepoRootPath(item);
 		if (!repoPath) {
-			console.debug('Could not obtain repo root path');
-			return;
+			throw new Error('Could not obtain repo root path');
 		}
 
 		const branch = await getCurrentBranch(repoPath);
 		if (!branch) {
-			console.debug('Could not get current branch');
-			return;
+			throw new Error('Could not get current branch');
 		}
 
 		const repoUrl = await getRepoRemoteUrl(repoPath);
 		if (!repoUrl) {
-			console.debug(`Could not obtain repo url`);
-			return;
+			throw new Error(`Could not obtain repo url`);
 		}
 
 		const pathToFile = repoPathToFile(repoPath, item);
@@ -96,8 +93,8 @@ export async function buildUrl(item: SourceItem): Promise<string | undefined> {
 
 		console.debug(`Final url: ${finalUrl}`);
 		return finalUrl;
-	} catch (e) {
-		console.error(e);
+	} catch (e: any) {
+		console.error(`Unable to construct repo url: ${e.message}`);
 	}
 	return;
 }
