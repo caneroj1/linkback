@@ -28,6 +28,7 @@ export function createSelectionInfo(item: SourceItem, repoType: RepoType): strin
 		case RepoType.gitLab:
 			return `#L${startLine}-${endLine}`;
 		case RepoType.gitHub:
+			return `#L${startLine}-L${endLine}`;
 		case RepoType.other:
 			return `#L${startLine}-L${endLine}`;
 	}
