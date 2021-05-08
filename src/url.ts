@@ -37,7 +37,7 @@ export function createSelectionInfo(item: SourceItem, repoType: RepoType): strin
 export function parseUrl(repoUrl: string): RepoParseResult {
 	console.debug(`Parsing url: ${repoUrl}`);
 
-	const urlRegex = /^git@(?<hostName>\w+.\w+)$/;
+	const urlRegex = /^git@(?<hostName>\w+(.\w+)+)$/;
 	const [prefix, repository] = repoUrl.split(':');
 
 	const regexResults = urlRegex.exec(prefix);
@@ -46,7 +46,7 @@ export function parseUrl(repoUrl: string): RepoParseResult {
 	}
 	const hostName = regexResults.groups.hostName;
 
-	if (!repository.endsWith('.git')) {
+	if (!repository || !repository.endsWith('.git')) {
 		throw new Error(`Ill-formed url: ${repoUrl}`);
 	}
 

@@ -32,10 +32,10 @@ suite('Linkback Test Suite', () => {
 	});
 
 	test('Parse other gitlab url', () => {
-		const testUrl = 'git@clone.gitlab.gov:org-name/repo-name_123.git';
+		const testUrl = 'git@clone.gitlab.private.gov:org-name/repo-name_123.git';
 		const results = parseUrl(testUrl);
-		assert(results.repoType === RepoType.gitHub);
-		assert(results.url === 'https://clone.gitlab.org/org-name/repo-name_123');
+		assert(results.repoType === RepoType.gitLab);
+		assert(results.url === 'https://clone.gitlab.private.gov/org-name/repo-name_123');
 	});
 
 	test('Parse other git host url', () => {
@@ -50,8 +50,13 @@ suite('Linkback Test Suite', () => {
 		assert.throws(() => parseUrl(testUrl), new Error(`Ill-formed url: ${testUrl}`));
 	});
 
-	test('Parse malformed git url', () => {
-		const testUrl = 'git@githost.com/org/repo';
+	test('Parse malformed git url, no org/repo split', () => {
+		const testUrl = 'git@githost.com/org/repo.git';
+		assert.throws(() => parseUrl(testUrl), new Error(`Ill-formed url: ${testUrl}`));
+	});
+
+	test('Parse malformed git url, no .git', () => {
+		const testUrl = 'git@githost.com:org/repo';
 		assert.throws(() => parseUrl(testUrl), new Error(`Ill-formed url: ${testUrl}`));
 	});
 
@@ -60,13 +65,13 @@ suite('Linkback Test Suite', () => {
 			filepath: 'test',
 			selection: {
 				start: {
-					line: 1,
+					line: 0,
 				},
 				end: {
-					line: 100,
+					line: 99,
 				}
 			},
-		}
+		};
 		const selectionInfo = createSelectionInfo(sourceItem, RepoType.gitHub);
 		assert(selectionInfo === '#L1-L100');
 	});
@@ -76,13 +81,13 @@ suite('Linkback Test Suite', () => {
 			filepath: 'test',
 			selection: {
 				start: {
-					line: 1,
+					line: 0,
 				},
 				end: {
-					line: 100,
+					line: 99,
 				}
 			},
-		}
+		};
 		const selectionInfo = createSelectionInfo(sourceItem, RepoType.gitLab);
 		assert(selectionInfo === '#L1-100');
 	});
@@ -92,14 +97,23 @@ suite('Linkback Test Suite', () => {
 			filepath: 'test',
 			selection: {
 				start: {
-					line: 1,
+					line: 0,
 				},
 				end: {
-					line: 100,
+					line: 99,
 				}
 			},
-		}
+		};
 		const selectionInfo = createSelectionInfo(sourceItem, RepoType.other);
 		assert(selectionInfo === '#L1-L100');
+	});
+
+	test('Create no selection info', () => {
+		const sourceItem: SourceItem = {
+			filepath: 'test',
+			selection: undefined,
+		};
+		const selectionInfo = createSelectionInfo(sourceItem, RepoType.other);
+		assert(selectionInfo === '');
 	});
 });
