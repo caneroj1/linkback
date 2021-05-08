@@ -13,10 +13,7 @@ async function executeCommand(command: string): Promise<string | undefined> {
 				console.error(err);
 				resolve(undefined);
 			} else {
-				// TODO
-				// inspect output when there is no git repo
 				const output = stdout.trim();
-				console.log(output);
 				resolve(output);
 			}
 		});

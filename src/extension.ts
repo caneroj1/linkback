@@ -11,13 +11,14 @@ import {
 } from './url';
 
 async function linkBack(item: SourceItem) {
-	const url = await buildUrl(item);
-	if (!url) {
-		return;
+	try {
+		const url = await buildUrl(item);
+		console.debug(`Launching: ${url}`);
+		vscode.env.openExternal(vscode.Uri.parse(url));
+	} catch (e: any) {
+		console.error(e);
+		vscode.window.showErrorMessage(e.message);
 	}
-
-	console.debug(`Launching: ${url}`);
-	vscode.env.openExternal(vscode.Uri.parse(url));
 }
 
 // this method is called when your extension is activated

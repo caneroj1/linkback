@@ -68,33 +68,28 @@ function parseUrl(repoUrl: string): RepoParseResult {
 	};
 }
 
-export async function buildUrl(item: SourceItem): Promise<string | undefined> {
+export async function buildUrl(item: SourceItem): Promise<string> {
 	console.debug('Building url for source item: ', item);
-	try {
-		const repoPath = await getRepoRootPath(item);
-		if (!repoPath) {
-			throw new Error('Could not obtain repo root path');
-		}
+    const repoPath = await getRepoRootPath(item);
+    if (!repoPath) {
+        throw new Error('Could not obtain path to git repository');
+    }
 
-		const branch = await getCurrentBranch(repoPath);
-		if (!branch) {
-			throw new Error('Could not get current branch');
-		}
+    const branch = await getCurrentBranch(repoPath);
+    if (!branch) {
+        throw new Error('Could not get current git branch');
+    }
 
-		const repoUrl = await getRepoRemoteUrl(repoPath);
-		if (!repoUrl) {
-			throw new Error(`Could not obtain repo url`);
-		}
+    const repoUrl = await getRepoRemoteUrl(repoPath);
+    if (!repoUrl) {
+        throw new Error(`Could not obtain git remote url`);
+    }
 
-		const pathToFile = repoPathToFile(repoPath, item);
-		const parseResult = parseUrl(repoUrl);
-		const selectionInfo = createSelectionInfo(item, parseResult.repoType);
-		const finalUrl = `${parseResult.url}/blob/${branch}${pathToFile}${selectionInfo}`;
+    const pathToFile = repoPathToFile(repoPath, item);
+    const parseResult = parseUrl(repoUrl);
+    const selectionInfo = createSelectionInfo(item, parseResult.repoType);
+    const finalUrl = `${parseResult.url}/blob/${branch}${pathToFile}${selectionInfo}`;
 
-		console.debug(`Final url: ${finalUrl}`);
-		return finalUrl;
-	} catch (e: any) {
-		console.error(`Unable to construct repo url: ${e.message}`);
-	}
-	return;
+    console.debug(`Final url: ${finalUrl}`);
+    return finalUrl;
 }
