@@ -16,7 +16,7 @@ function repoPathToFile(repoPath: string, item: SourceItem): string {
 
 // gitlab: #L6-10
 // github: #L6-L10
-function createSelectionInfo(item: SourceItem, repoType: RepoType): string {
+export function createSelectionInfo(item: SourceItem, repoType: RepoType): string {
 	if (item.selection === undefined) {
 		return '';
 	}
@@ -25,19 +25,19 @@ function createSelectionInfo(item: SourceItem, repoType: RepoType): string {
 	const endLine = item.selection.end.line + 1;
 
 	switch (repoType) {
-		case RepoType.GitLab:
+		case RepoType.gitLab:
 			return `#L${startLine}-${endLine}`;
-		case RepoType.GitHub:
-		case RepoType.Other:
+		case RepoType.gitHub:
+		case RepoType.other:
 			return `#L${startLine}-L${endLine}`;
 	}
 }
 
 // git@github.com:org/repo.git
-function parseUrl(repoUrl: string): RepoParseResult {
+export function parseUrl(repoUrl: string): RepoParseResult {
 	console.debug(`Parsing url: ${repoUrl}`);
 
-	const urlRegex = /^git@(?<hostName>\w+.\w+)$/
+	const urlRegex = /^git@(?<hostName>\w+.\w+)$/;
 	const [prefix, repository] = repoUrl.split(':');
 
 	const regexResults = urlRegex.exec(prefix);
@@ -55,11 +55,11 @@ function parseUrl(repoUrl: string): RepoParseResult {
 	const url = `https://${hostName}/${orgAndRepo}`;
 	console.debug(`Parsed url: ${url}`);
 
-	let repoType = RepoType.Other;
+	let repoType = RepoType.other;
 	if (hostName.includes('github')) {
-		repoType = RepoType.GitHub;
+		repoType = RepoType.gitHub;
 	} else if (hostName.includes('gitlab')) {
-		repoType = RepoType.GitLab;
+		repoType = RepoType.gitLab;
 	}
 
 	return {
