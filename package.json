@@ -9,6 +9,8 @@
 	"categories": [
 		"Other"
 	],
+	"publisher": "jcanero",
+	"repository": "https://github.com/caneroj1/linkback",
 	"activationEvents": [
 		"onCommand:linkback.openFile",
 		"onCommand:linkback.openFileSelection"

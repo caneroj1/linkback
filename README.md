@@ -1,4 +1,4 @@
-# linkback README
+# linkback
 
 This vscode extensions provides commands to open files in a remote git repository. This has been tested with gitlab and github urls, but it should support other urls out of the box, as well.
 
